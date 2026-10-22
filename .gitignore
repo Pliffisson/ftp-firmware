@@ -1,0 +1,8 @@
+firmwares/*
+!firmwares/.gitkeep
+branding/*
+!branding/.gitkeep
+!branding/logo.png
+transfers/*
+!transfers/.gitkeep
+.env
