@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Firmware de equipamentos</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #0b1020; color: #e9edf8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 85% -10%, #26346d 0, transparent 35%), #0b1020; }
+    main { max-width: 1200px; margin: auto; padding: 52px 24px 80px; }
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 28px; }
+    .heading { min-width: 0; }
+    .brand { flex-shrink: 0; }
+    .brand img { display: block; max-width: 220px; max-height: 72px; object-fit: contain; }
+    .brand img[hidden] { display: none; }
+    h1 { font-size: clamp(32px, 4vw, 48px); margin: 0 0 8px; letter-spacing: -.04em; }
+    .heading p { margin: 0; }
+    p { color: #aab4cc; line-height: 1.5; }
+    .grid { margin: 34px 0; }
+    .card { background: #151d32; border: 1px solid #2b3652; border-radius: 18px; padding: 24px; box-shadow: 0 18px 40px #05081535; }
+    h2 { font-size: 17px; margin: 0 0 16px; }
+    label { display: block; color: #c4cde0; font-size: 13px; font-weight: 650; margin: 0 0 8px; }
+    input[type=text], input[type=file] { width: 100%; border: 1px solid #34415e; border-radius: 10px; background: #0d1426; color: #f4f6fb; padding: 12px; font: inherit; }
+    input[type=file]::file-selector-button { border: 0; border-radius: 7px; background: #2b3d66; color: white; padding: 8px 12px; margin-right: 12px; cursor: pointer; }
+    button { border: 0; border-radius: 10px; padding: 12px 17px; font: inherit; font-weight: 700; cursor: pointer; color: white; background: #536ff0; }
+    button:hover { background: #6c85ff; }
+    button:disabled { opacity: .55; cursor: wait; }
+    button.secondary { background: #273653; }
+    button.secondary:hover { background: #354a70; }
+    button.danger { background: #542d3c; color: #ffdce4; }
+    button.danger:hover { background: #743b4f; }
+    form button { margin-top: 14px; }
+    .hint { font-size: 13px; margin-bottom: 0; }
+    .status { min-height: 22px; margin: 12px 0 0; font-size: 13px; }
+    .status.error { color: #ff9e9e; }
+    .status.ok { color: #7de0b7; }
+    .upload-progress { margin-top: 14px; }
+    .upload-progress[hidden] { display: none; }
+    .progress-label { display: flex; justify-content: space-between; gap: 12px; color: #c4cde0; font-size: 13px; margin-bottom: 8px; }
+    progress { display: block; width: 100%; height: 12px; border: 0; border-radius: 99px; overflow: hidden; background: #0d1426; }
+    progress::-webkit-progress-bar { background: #0d1426; border-radius: 99px; }
+    progress::-webkit-progress-value { background: #6c85ff; border-radius: 99px; }
+    progress::-moz-progress-bar { background: #6c85ff; border-radius: 99px; }
+    .list-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .list-head span { color: #93a0bb; font-size: 13px; }
+    .file { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 16px; row-gap: 14px; padding: 17px 0; border-top: 1px solid #2b3652; }
+    .file:first-child { border-top: 0; }
+    .file-info { min-width: 0; }
+    .file-name { overflow-wrap: anywhere; font-weight: 700; }
+    .file-meta { color: #93a0bb; font-size: 12px; margin-top: 5px; }
+    .transfer { grid-column: 1 / -1; width: 100%; padding: 14px 16px; border: 1px solid #34415e; border-radius: 12px; background: #0d1426; }
+    .transfer[hidden] { display: none; }
+    .transfer .progress-label { align-items: baseline; margin-bottom: 8px; font-weight: 700; }
+    .transfer progress { height: 14px; }
+    .transfer-details { color: #aab4cc; font-size: 12px; margin-top: 9px; }
+    .transfer-note { color: #90a0be; font-size: 12px; margin-top: 4px; }
+    .transfer.complete { border-color: #28745d; background: #102b2c; }
+    .transfer.complete .progress-label { color: #81e6b6; }
+    .transfer.complete progress::-webkit-progress-value { background: #42ca92; }
+    .transfer.complete progress::-moz-progress-bar { background: #42ca92; }
+    .transfer.failed { border-color: #854252; background: #2c1c2a; }
+    .transfer.failed .progress-label { color: #ffadb8; }
+    .transfer.failed progress::-webkit-progress-value { background: #df6f83; }
+    .transfer.failed progress::-moz-progress-bar { background: #df6f83; }
+    .file-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .file-actions button { font-size: 12px; padding: 9px 11px; }
+    #empty { color: #93a0bb; padding: 22px 0 8px; }
+    @media (max-width: 700px) { .page-header { flex-wrap: wrap; } .file { grid-template-columns: 1fr; } .file-actions { flex-wrap: wrap; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="page-header">
+      <div class="heading">
+        <h1>Firmware de equipamentos</h1>
+      </div>
+      <div class="brand">
+        <img src="/api/logo" alt="Logo da empresa" onerror="this.hidden=true">
+      </div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Enviar firmware para o servidor TFTP</h2>
+        <form id="upload-form">
+          <label for="firmware">Selecione um arquivo</label>
+          <input id="firmware" name="file" type="file" required>
+          <button id="upload-button" type="submit">Enviar firmware para o servidor TFTP</button>
+        </form>
+        <div id="upload-progress" class="upload-progress" hidden>
+          <div class="progress-label"><span id="progress-stage">Enviando arquivo</span><span id="progress-percent">0%</span></div>
+          <progress id="progress-bar" max="100" value="0" aria-label="Progresso do envio"></progress>
+        </div>
+        <div id="upload-status" class="status" role="status" aria-live="polite"></div>
+        <p class="hint">Tamanho máximo: 2 GB. Arquivos existentes não são substituídos.</p>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="list-head"><h2>Firmwares disponíveis</h2><span id="count"></span></div>
+      <div id="files"></div>
+      <div id="empty" hidden>Nenhum firmware enviado ainda.</div>
+    </section>
+  </main>
+  <script>
+    const form = document.getElementById('upload-form');
+    const button = document.getElementById('upload-button');
+    const status = document.getElementById('upload-status');
+    const progressBox = document.getElementById('upload-progress');
+    const progressBar = document.getElementById('progress-bar');
+    const progressPercent = document.getElementById('progress-percent');
+    const progressStage = document.getElementById('progress-stage');
+    const list = document.getElementById('files');
+
+    function message(text, kind) {
+      status.textContent = text;
+      status.className = 'status ' + kind;
+    }
+    function formatBytes(bytes) {
+      return `${(bytes / 1024 / 1024).toLocaleString('pt-BR', {maximumFractionDigits: 2})} MB`;
+    }
+    async function copy(value, target) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(value);
+        } else {
+          const field = document.createElement('textarea');
+          field.value = value;
+          field.style.position = 'fixed';
+          field.style.opacity = '0';
+          document.body.appendChild(field);
+          field.select();
+          const copied = document.execCommand('copy');
+          field.remove();
+          if (!copied) throw new Error('Falha ao copiar');
+        }
+        const original = target.textContent;
+        target.textContent = 'Copiado!';
+        setTimeout(() => target.textContent = original, 1800);
+        return true;
+      } catch {
+        message('Não foi possível copiar. Verifique as permissões do navegador.', 'error');
+        return false;
+      }
+    }
+    async function loadFiles() {
+      try {
+        const response = await fetch('/api/files');
+        if (!response.ok) throw new Error('Não foi possível listar os arquivos.');
+        const files = await response.json();
+        list.replaceChildren();
+        document.getElementById('count').textContent = `${files.length} arquivo${files.length === 1 ? '' : 's'}`;
+        document.getElementById('empty').hidden = files.length !== 0;
+        for (const file of files) {
+          const row = document.createElement('div'); row.className = 'file';
+          const info = document.createElement('div'); info.className = 'file-info';
+          const name = document.createElement('div'); name.className = 'file-name'; name.textContent = file.name;
+          const meta = document.createElement('div'); meta.className = 'file-meta';
+          meta.textContent = `${(file.size / 1024 / 1024).toLocaleString('pt-BR', {maximumFractionDigits: 2})} MB · ${new Date(file.modified * 1000).toLocaleString('pt-BR')}`;
+          info.append(name, meta);
+          const transfer = document.createElement('div'); transfer.className = 'transfer'; transfer.hidden = true;
+          const transferLabel = document.createElement('div'); transferLabel.className = 'progress-label';
+          const transferStage = document.createElement('span');
+          const transferPercent = document.createElement('span'); transferPercent.textContent = '0%';
+          transferLabel.append(transferStage, transferPercent);
+          const transferBar = document.createElement('progress'); transferBar.max = 100; transferBar.value = 0;
+          transferBar.setAttribute('aria-label', `Download TFTP de ${file.name}`);
+          const transferDetails = document.createElement('div'); transferDetails.className = 'transfer-details';
+          const transferNote = document.createElement('div'); transferNote.className = 'transfer-note';
+          transfer.append(transferLabel, transferBar, transferDetails, transferNote);
+          const showTransfer = (current, previous = false) => {
+            transfer.hidden = false;
+            transfer.className = `transfer ${current.state}`;
+            const percent = current.total > 0 ? Math.min(99, Math.floor(current.bytes / current.total * 100)) : 0;
+            transferBar.value = current.state === 'complete' ? 100 : percent;
+            transferPercent.textContent = `${transferBar.value}%`;
+            if (current.state === 'complete') {
+              transferStage.textContent = previous ? '✓ Último download TFTP concluído' : '✓ Download TFTP concluído';
+              transferDetails.textContent = `Equipamento ${current.client} · ${formatBytes(current.total)} · ${new Date(current.updated_at_ms).toLocaleString('pt-BR')}`;
+              transferNote.textContent = 'O envio do arquivo terminou. A instalação no equipamento não é monitorada.';
+            } else if (current.state === 'error' || current.state === 'timeout') {
+              transferStage.textContent = 'Transferência TFTP interrompida';
+              transferDetails.textContent = `Equipamento ${current.client} · ${formatBytes(current.bytes)} de ${formatBytes(current.total)} enviados`;
+              transferNote.textContent = 'Confira o equipamento e tente novamente.';
+            } else {
+              transferStage.textContent = `Enviando firmware para ${current.client}`;
+              transferDetails.textContent = `${formatBytes(current.bytes)} de ${formatBytes(current.total)} enviados`;
+              transferNote.textContent = '';
+            }
+          };
+          const actions = document.createElement('div'); actions.className = 'file-actions';
+          const url = document.createElement('button'); url.textContent = 'Copiar URL TFTP';
+          let pollTimer;
+          let watching = false;
+          url.addEventListener('click', async () => {
+            if (!await copy(`tftp://${location.hostname}/${encodeURI(file.name)}`, url)) return;
+            clearInterval(pollTimer);
+            const copiedAt = Date.now();
+            watching = true;
+            transfer.hidden = false;
+            transfer.className = 'transfer waiting';
+            transferBar.value = 0;
+            transferPercent.textContent = '0%';
+            transferStage.textContent = 'Aguardando solicitação do equipamento';
+            transferDetails.textContent = 'Configure a caixa com a URL TFTP copiada.';
+            transferNote.textContent = 'A barra avançará quando o download começar.';
+            let checking = false;
+            let seenTransfer = false;
+            const check = async () => {
+              if (checking) return;
+              checking = true;
+              try {
+                const response = await fetch(`/api/transfers/${encodeURIComponent(file.name)}`, {cache: 'no-store'});
+                if (response.status === 204) return;
+                if (!response.ok) throw new Error('Falha ao consultar o download.');
+                const current = await response.json();
+                if (current.state !== 'in_progress' && current.age_ms > Date.now() - copiedAt + 2000) return;
+                seenTransfer = true;
+                showTransfer(current);
+                if (current.state === 'complete' || current.state === 'error' || current.state === 'timeout') {
+                  clearInterval(pollTimer);
+                  watching = false;
+                }
+              } catch { transferNote.textContent = 'Não foi possível consultar o progresso agora. Tentando novamente…'; }
+              finally { checking = false; }
+            };
+            pollTimer = setInterval(() => {
+              if (!seenTransfer && Date.now() - copiedAt > 10 * 60 * 1000) {
+                clearInterval(pollTimer);
+                watching = false;
+                transferStage.textContent = 'Nenhum download TFTP detectado';
+                transferDetails.textContent = 'O equipamento não solicitou este firmware nos últimos 10 minutos.';
+                transferNote.textContent = 'Copie a URL novamente para acompanhar uma nova tentativa.';
+              } else check();
+            }, 1000);
+            check();
+          });
+          const remove = document.createElement('button'); remove.className = 'danger'; remove.textContent = 'Excluir';
+          remove.addEventListener('click', async () => {
+            if (!confirm(`Excluir o firmware "${file.name}"?`)) return;
+            remove.disabled = true;
+            try {
+              const response = await fetch(`/api/files/${encodeURIComponent(file.name)}`, {method: 'DELETE'});
+              if (!response.ok) {
+                const result = await response.json();
+                throw new Error(result.error || 'Não foi possível excluir o arquivo.');
+              }
+              message(`${file.name} excluído com sucesso.`, 'ok');
+              await loadFiles();
+            } catch (error) { message(error.message, 'error'); remove.disabled = false; }
+          });
+          actions.append(url, remove); row.append(info, actions, transfer); list.append(row);
+          fetch(`/api/transfers/${encodeURIComponent(file.name)}`, {cache: 'no-store'})
+            .then(response => response.status === 200 ? response.json() : null)
+            .then(current => {
+              if (!watching && current && (current.state === 'complete' || (current.state === 'in_progress' && current.age_ms < 30000))) {
+                showTransfer(current, current.state === 'complete');
+              }
+            }).catch(() => {});
+        }
+      } catch (error) { message(error.message, 'error'); }
+    }
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const data = new FormData(form);
+      button.disabled = true;
+      document.getElementById('firmware').disabled = true;
+      progressBox.hidden = false;
+      progressBar.value = 0;
+      progressPercent.textContent = '0%';
+      progressStage.textContent = 'Enviando arquivo';
+      message('', '');
+      try {
+        const result = await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/files');
+          xhr.upload.onprogress = event => {
+            if (!event.lengthComputable) return;
+            const percent = Math.min(100, Math.round(event.loaded / event.total * 100));
+            progressBar.value = percent;
+            progressPercent.textContent = `${percent}%`;
+            if (percent === 100) progressStage.textContent = 'Finalizando no servidor';
+          };
+          xhr.onload = () => {
+            let body;
+            try { body = JSON.parse(xhr.responseText); }
+            catch { reject(new Error('Resposta inválida do servidor.')); return; }
+            if (xhr.status < 200 || xhr.status >= 300) reject(new Error(body.error || 'Falha no envio.'));
+            else resolve(body);
+          };
+          xhr.onerror = () => reject(new Error('Falha de conexão durante o envio.'));
+          xhr.send(data);
+        });
+        progressBar.value = 100;
+        progressPercent.textContent = '100%';
+        progressStage.textContent = 'Envio concluído';
+        form.reset();
+        message(`${result.name} enviado com sucesso. Use os botões abaixo para copiar o caminho.`, 'ok');
+        await loadFiles();
+      } catch (error) { progressBox.hidden = true; message(error.message, 'error'); }
+      finally { button.disabled = false; document.getElementById('firmware').disabled = false; }
+    });
+    loadFiles();
+  </script>
+</body>
+</html>

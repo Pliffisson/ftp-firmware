@@ -1,0 +1,4 @@
+*
+!Dockerfile
+!tftp-monitor.go
+!start-tftp.sh

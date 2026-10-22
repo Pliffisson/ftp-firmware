@@ -1,0 +1,19 @@
+services:
+  tftp:
+    build: .
+    container_name: firmware-tftp
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./firmwares:/srv/tftp:ro
+      - ./transfers:/srv/transfers
+  dashboard:
+    build: ./dashboard
+    container_name: firmware-dashboard
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-8088}:8080"
+    volumes:
+      - ./firmwares:/srv/tftp
+      - ./branding:/srv/branding:ro
+      - ./transfers:/srv/transfers:ro
