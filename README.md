@@ -11,6 +11,10 @@ Servidor TFTP em contêiner para distribuir firmwares a equipamentos na rede loc
 
 ## Visão do dashboard
 
+![Exemplo do dashboard com dados fictícios](docs/dashboard-exemplo.png)
+
+*Imagem ilustrativa com nomes de arquivos, IP e horários fictícios.*
+
 - 📦 **Envio de firmware:** selecione um arquivo de até 2 GB e acompanhe o upload para o servidor.
 - 📋 **URL pronta para uso:** copie o endereço TFTP do firmware listado para configurar o equipamento.
 - 📈 **Download acompanhado:** veja percentual, volume enviado e IP do equipamento durante a transferência.
